@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Make 24</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9e4d6;--ink:#1d2540;--card:#fffdf6;--card-ink:#1d2540;--red:#c23a3a;--accent:#f2b632;--accent-ink:#1d2540;--panel:#d9d2bf;--ok:#2e7d57;--line:#b9b19b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d2540;--ink:#f3eedd;--card:#fffdf6;--card-ink:#1d2540;--red:#d64b4b;--panel:#2a3556;--ok:#5cc48e;--line:#46537d}}
+:root[data-theme="dark"]{--bg:#1d2540;--ink:#f3eedd;--card:#fffdf6;--card-ink:#1d2540;--red:#d64b4b;--panel:#2a3556;--ok:#5cc48e;--line:#46537d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-weight:500;min-height:100vh;display:flex;justify-content:center}
+main{width:100%;max-width:560px;padding:20px 16px 32px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.theme{width:40px;height:40px;flex:none;border-radius:50%;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;padding:0}
+.theme:focus-visible{outline:4px solid var(--accent);outline-offset:2px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:800;font-size:2.4rem;margin:0;letter-spacing:-.02em}
+.stats{display:flex;gap:16px;font-size:.95rem}
+.stats b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.target{text-align:center;font-size:1rem}
+.target span{font-family:'Fraunces',Georgia,serif;font-weight:800;font-size:1.1rem}
+#table{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:300px}
+.card{position:relative;aspect-ratio:3/4;background:var(--card);color:var(--card-ink);border:0;border-radius:14px;font-family:'Fraunces',Georgia,serif;font-weight:800;font-size:3.6rem;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 0 var(--line),0 8px 18px rgba(0,0,0,.18);transition:transform .15s,outline-color .15s;outline:4px solid transparent;outline-offset:2px;padding:0}
+.card:nth-child(odd){color:var(--card-ink)}.card.red{color:var(--red)}
+.card.sel{transform:translateY(-8px);outline-color:var(--accent)}
+.card.pop{animation:pop .3s}
+.card:focus-visible,.op:focus-visible,.btn:focus-visible{outline:4px solid var(--accent);outline-offset:2px}
+.card small{position:absolute;top:8px;left:12px;font-size:1rem}
+.card .frac{display:flex;flex-direction:column;align-items:center;font-size:2.2rem;line-height:1}
+.card .frac i{display:block;width:100%;height:3px;background:currentColor;margin:4px 0;border-radius:2px}
+.card .big{font-size:2.8rem}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.shake .card{animation:shake .35s}
+#ops{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.op{height:64px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:2rem;font-weight:700;cursor:pointer;font-family:inherit}
+.op.sel{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#msg{min-height:3em;text-align:center;font-size:1.05rem;line-height:1.4}
+#msg.win{color:var(--ok);font-weight:700}
+#acts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.btn{height:48px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lv{height:48px;border-radius:12px;border:2px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.lv .dots{display:flex;gap:3px}.lv .dots i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.lv.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.lv:focus-visible{outline:4px solid var(--accent);outline-offset:2px}
+#lvdesc{text-align:center;font-size:.9rem;margin-top:-8px;opacity:.8}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:480px){#table{grid-template-columns:repeat(4,1fr)}.card{font-size:2.6rem}.card .frac{font-size:1.5rem}.card .big{font-size:2rem}#table{min-height:0}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Make 24</h1>
+    <div class="stats"><div>Solved <b id="solved">0</b></div><div>Streak <b id="streak">0</b></div><div><b id="time">0:00</b></div></div>
+    <button class="theme" id="theme" aria-label="Switch theme"></button>
+  </header>
+  <div class="target">Combine all four cards into <span>24</span>. Tap a card, an operator (+ − × ÷), then another card.</div>
+  <div class="levels" role="group" aria-label="Difficulty">
+    <button class="lv on" data-lv="1" aria-pressed="true"><span class="dots"><i></i></span>Easy</button>
+    <button class="lv" data-lv="2" aria-pressed="false"><span class="dots"><i></i><i></i></span>Medium</button>
+    <button class="lv" data-lv="3" aria-pressed="false"><span class="dots"><i></i><i></i><i></i></span>Hard</button>
+  </div>
+  <div id="lvdesc">Level 1: number groups with many solutions.</div>
+  <div id="table" aria-live="polite"></div>
+  <div id="ops" role="group" aria-label="Operators">
+    <button class="op" data-op="+" aria-label="Add">+</button>
+    <button class="op" data-op="-" aria-label="Subtract">−</button>
+    <button class="op" data-op="*" aria-label="Multiply">×</button>
+    <button class="op" data-op="/" aria-label="Divide">÷</button>
+  </div>
+  <div id="msg"></div>
+  <div id="acts">
+    <button class="btn" id="undo">Undo</button>
+    <button class="btn" id="reset">Reset</button>
+    <button class="btn" id="hint">Solution</button>
+    <button class="btn primary" id="next">Skip</button>
+  </div>
+</main>
+<script>
+(function(){
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const mk=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}};
+const calc=(a,op,b)=>{
+  if(op==='+')return mk(a.n*b.d+b.n*a.d,a.d*b.d);
+  if(op==='-')return mk(a.n*b.d-b.n*a.d,a.d*b.d);
+  if(op==='*')return mk(a.n*b.n,a.d*b.d);
+  if(b.n===0)return null;
+  return mk(a.n*b.d,a.d*b.n);
+};
+const SYM={'+':'+','-':'−','*':'×','/':'÷'};
+
+// Solver: returns expression string or null
+function solve(items,m){
+  if(items.length===1)return(items[0].v.n===24&&items[0].v.d===1)?items[0].s:null;
+  for(let i=0;i<items.length;i++)for(let j=0;j<items.length;j++){
+    if(i===j)continue;
+    const rest=items.filter((_,k)=>k!==i&&k!==j);
+    for(const op of (m===1?['+','-','*']:['+','-','*','/'])){
+      if((op==='+'||op==='*')&&i>j)continue;
+      const v=calc(items[i].v,op,items[j].v);
+      if(!v)continue;
+      if(m===2&&v.d!==1)continue;
+      const r=solve([...rest,{v,s:'('+items[i].s+' '+SYM[op]+' '+items[j].s+')'}],m);
+      if(r)return r;
+    }
+  }
+  return null;
+}
+const solution=(nums,m)=>{const s=solve(nums.map(x=>({v:mk(x),s:String(x)})),m);return s&&s.replace(/^\((.*)\)$/,'$1')};
+// Difficulty comes from the number group: more whole-number solutions = easier.
+function countSol(a){
+  if(a.length===1)return a[0]===24?1:0;
+  let t=0;
+  for(let i=0;i<a.length;i++)for(let j=0;j<a.length;j++){
+    if(i===j)continue;
+    const r=a.filter((_,k)=>k!==i&&k!==j),x=a[i],y=a[j];
+    const vs=[];
+    if(i<j){vs.push(x+y,x*y)}
+    vs.push(x-y);
+    if(y!==0&&x%y===0)vs.push(x/y);
+    for(const v of vs)t+=countSol([...r,v]);
+  }
+  return t;
+}
+const POOLS=[[],[],[],[]];
+(function(){
+  const all=[];
+  for(let a=1;a<=10;a++)for(let b=a;b<=10;b++)for(let c=b;c<=10;c++)for(let d=c;d<=10;d++){
+    const n=countSol([a,b,c,d]);if(n>0)all.push({g:[a,b,c,d],n});
+  }
+  all.sort((p,q)=>q.n-p.n);
+  const k=Math.floor(all.length/3);
+  all.forEach((p,i)=>POOLS[i<k?1:i<2*k?2:3].push(p.g));
+})();
+const DESC=['','Level 1: number groups with many solutions.','Level 2: number groups with a moderate number of solutions.','Level 3: number groups with only a few solutions.'];
+
+const $=id=>document.getElementById(id);
+let level=1,cards,nums,history,selA,selOp,solved=0,streak=0,secs=0,timer,done,uid;
+
+function newPuzzle(){
+  const pool=POOLS[level];nums=[...pool[Math.floor(Math.random()*pool.length)]].sort(()=>Math.random()-.5);
+  reset();secs=0;clearInterval(timer);timer=setInterval(()=>{secs++;$('time').textContent=Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')},1000);$('time').textContent='0:00';
+}
+function reset(){
+  uid=0;cards=nums.map(n=>({id:uid++,v:mk(n),orig:true}));history=[];selA=null;selOp=null;done=false;
+  say('');render();
+}
+function say(t,cls){const m=$('msg');m.textContent=t;m.className=cls||''}
+function fracHTML(v,cls){
+  if(v.d===1)return String(v.n);
+  return '<span class="frac"><span>'+v.n+'</span><i></i><span>'+v.d+'</span></span>';
+}
+function render(newId){
+  const t=$('table');t.innerHTML='';
+  cards.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='card'+(i===selA?' sel':'')+(c.v.n<0?' red':'')+(c.id===newId?' pop':'');
+    b.innerHTML=fracHTML(c.v);
+    b.setAttribute('aria-label','Card '+(c.v.d===1?c.v.n:c.v.n+' over '+c.v.d));
+    b.onclick=()=>pick(i);
+    t.appendChild(b);
+  });
+  document.querySelectorAll('.op').forEach(o=>o.classList.toggle('sel',o.dataset.op===selOp));
+  $('undo').disabled=!history.length;
+}
+function pick(i){
+  if(done)return;
+  if(selA===null){selA=i;render();return}
+  if(selOp===null){selA=(selA===i)?null:i;render();return}
+  if(selA===i){selA=null;render();return}
+  const a=cards[selA],b=cards[i];
+  const v=calc(a.v,selOp,b.v);
+  if(!v){say('You can\u2019t divide by zero. Pick another card.');selOp=null;render();return}
+  if(v.d!==1){say('Division has to come out even. Pick another pair.');selOp=null;render();return}
+  history.push(cards.map(c=>({...c})));
+  const rest=cards.filter((_,k)=>k!==selA&&k!==i);
+  const nc={id:uid++,v};
+  cards=[...rest,nc];selA=null;selOp=null;
+  render(nc.id);
+  if(cards.length===1)finish();
+}
+function finish(){
+  const v=cards[0].v;
+  if(v.n===24&&v.d===1){
+    done=true;solved++;streak++;clearInterval(timer);
+    $('solved').textContent=solved;$('streak').textContent=streak;
+    say('24 in '+secs+'s. Nicely done.','win');
+    $('next').textContent='Next puzzle';
+  }else{
+    const s=v.d===1?v.n:v.n+'/'+v.d;
+    say('That makes '+s+', not 24. Undo to try another route.');
+    $('table').classList.add('shake');setTimeout(()=>$('table').classList.remove('shake'),400);
+  }
+}
+document.querySelectorAll('.op').forEach(o=>o.onclick=()=>{
+  if(done||selA===null){if(!done)say('Pick a card first.');return}
+  selOp=(selOp===o.dataset.op)?null:o.dataset.op;render();
+});
+$('undo').onclick=()=>{if(!history.length||done)return;cards=history.pop();selA=null;selOp=null;say('');render()};
+$('reset').onclick=()=>{if(done)return;reset()};
+$('hint').onclick=()=>{
+  const s=solution(nums,2);
+  if(!done){streak=0;$('streak').textContent=0}
+  say('One solution: '+s+' = 24');
+};
+$('next').onclick=()=>{
+  if(!done&&cards.length>0&&secs>0&&$('next').textContent==='Skip'){streak=0;$('streak').textContent=0}
+  $('next').textContent='Skip';newPuzzle();
+};
+document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>{
+  level=+b.dataset.lv;
+  document.querySelectorAll('.lv').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-pressed',x===b)});
+  $('lvdesc').textContent=DESC[level];$('next').textContent='Skip';newPuzzle();
+});
+const tb=$('theme'),root=document.documentElement;
+function setTheme(t,save){
+  root.dataset.theme=t;tb.textContent=t==='dark'?'☀':'☾';
+  tb.setAttribute('aria-label',t==='dark'?'Switch to light mode':'Switch to dark mode');
+  if(save){try{localStorage.setItem('m24theme',t)}catch(e){}}
+}
+let st=null;try{st=localStorage.getItem('m24theme')}catch(e){}
+setTheme(st||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+tb.onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark',true);
+newPuzzle();
+})();
+</script>
+</body>
+</html>
